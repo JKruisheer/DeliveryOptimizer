@@ -1,4 +1,9 @@
 package org.acme.input;
 
-public record InventoryInput(String orderName, String customerName, String deliveryLocationName) {
+import java.util.List;
+
+public record InventoryInput(String orderName,
+                             String customerName,
+                             String deliveryLocationName,
+                             List<InventoryLineInput> inventoryLines) {
 }

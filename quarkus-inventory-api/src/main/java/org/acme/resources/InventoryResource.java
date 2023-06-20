@@ -1,28 +1,43 @@
 package org.acme.resources;
 
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.acme.entities.InventoryOrder;
-import org.acme.entities.InventoryOrderLine;
 import org.acme.input.InventoryInput;
-import org.acme.response.RequestResponse;
+import org.acme.utils.InventoryInputParser;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.hibernate.engine.spi.Status;
 
-import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Path("/api/v1/inventory")
 public class InventoryResource {
 
+    @Inject
+    InventoryInputParser parser;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/all")
-    public RequestResponse getAllInventoryItems(){
-        RequestResponse resp = new RequestResponse();
-        resp.setContent(InventoryOrder.listAll());
-        return resp;
+    public Response getAllInventoryItems(){
+//        RequestResponse resp = new RequestResponse();
+//        resp.setContent(InventoryOrder.listAll());
+        List<InventoryOrder> orders = InventoryOrder.listAll();
+
+        return Response.ok(orders).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/find/{id}")
+    public Response getSpecificInventoryItem(@PathParam("id") Long id){
+        Optional<InventoryOrder> order = InventoryOrder.findByIdOptional(id);
+        return order.isPresent() ? Response.ok(order.get()).build() :
+                Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @POST
@@ -30,12 +45,7 @@ public class InventoryResource {
     @Transactional
     @Path("/add")
     public Response createInventoryOrder(@RequestBody InventoryInput input){
-        InventoryOrder order = new InventoryOrder();
-        order.setOrderName(input.orderName());
-        order.setOrderDate(new Timestamp(System.currentTimeMillis()));
-        order.setCustomerName(input.customerName());
-        order.setDeliveryLocationName(input.deliveryLocationName());
-        order.persist();
+        parser.parseInventoryInput(input).persist();
         return Response.ok().build();
     }
 
@@ -44,6 +54,6 @@ public class InventoryResource {
     @Path("/remove/{id}")
     public Response deleteInventoryOrder(@PathParam("id") Long id){
         boolean itemDeleted = InventoryOrder.deleteById(id);
-        return Response.ok("Item deleted: " + itemDeleted).build();
+        return itemDeleted ? Response.status(204).build() : Response.status(404).build();
     }
 }
