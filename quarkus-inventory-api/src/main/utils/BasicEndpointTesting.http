@@ -1,0 +1,14 @@
+POST http://localhost:8080/api/v1/inventory/add
+Content-Type: application/json
+
+{
+  "orderName": "Order number",
+  "customerName": "Jesse",
+  "deliveryLocationName": "Boboli"
+}
+
+###
+GET http://localhost:8080/api/v1/inventory/all
+
+###
+DELETE http://localhost:8080/api/v1/inventory/remove/1

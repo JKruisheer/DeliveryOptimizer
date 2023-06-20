@@ -1,18 +1,13 @@
 package org.acme.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
-import org.jboss.resteasy.spi.touri.MappedBy;
-
-import java.io.Serial;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "XXINV_INVENTORY_ORDER")
 public class InventoryOrder extends PanacheEntityBase {
     @Id
     @SequenceGenerator(
@@ -23,7 +18,7 @@ public class InventoryOrder extends PanacheEntityBase {
     @Column(name = "INVENTORY_ORDER_ID")
     private Integer id;
 
-    public String orderName;
+    private String orderName;
 
     private Timestamp orderDate;
 
@@ -31,9 +26,45 @@ public class InventoryOrder extends PanacheEntityBase {
 
     private String deliveryLocationName;
 
-    @OneToMany(mappedBy = "inventoryOrder", cascade = CascadeType.ALL)
-    @JsonProperty(namespace = "lineeetje")
+    @OneToMany(mappedBy = "inventoryOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JsonProperty(namespace = "lineeetje")
     private List<InventoryOrderLine> lines = new ArrayList<>();
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getOrderName() {
+        return orderName;
+    }
+
+    public void setOrderName(String orderName) {
+        this.orderName = orderName;
+    }
+
+    public Timestamp getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Timestamp orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getDeliveryLocationName() {
+        return deliveryLocationName;
+    }
+
+    public void setDeliveryLocationName(String deliveryLocationName) {
+        this.deliveryLocationName = deliveryLocationName;
+    }
 
     public List<InventoryOrderLine> getLines() {
         return lines;

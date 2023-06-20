@@ -9,6 +9,7 @@ import org.acme.entities.data.InventoryProduct;
 import java.sql.Timestamp;
 
 @Entity
+@Table(name = "XXINV_INVENTORY_ORDER_LINE")
 public class InventoryOrderLine extends PanacheEntityBase {
 
     @Id
